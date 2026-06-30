@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Institute of Directors - Referral Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js" defer></script>
     <style>
         * {
             margin: 0;
@@ -12,18 +16,17 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #003d7a 0%, #0056b3 50%, #007bff 100%);
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
             min-height: 100vh;
-            padding: 20px;
+            background: #f4f7fb;
+            overflow-x: hidden;
         }
 
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            width: 100%;
+            max-width: 100%;
+            min-height: 100vh;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             overflow: hidden;
         }
 
@@ -562,46 +565,1051 @@
             border-radius: 6px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
+
+        /* Dashboard layout inspired by the reference: quiet, dense, full-screen workspace. */
+        :root {
+            --ink: #073047;
+            --muted: #6e8191;
+            --line: #dbe7f0;
+            --panel: #ffffff;
+            --soft: #f4f8fb;
+            --brand: #003d7a;
+            --brand-dark: #002d5c;
+            --accent: #0b78a8;
+        }
+
+        body {
+            color: var(--ink);
+            background: #e8eef5;
+        }
+
+        .container {
+            display: grid;
+            grid-template-rows: 72px 1fr 58px;
+            min-height: 100vh;
+            background: var(--panel);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            padding: 0 28px;
+            background: linear-gradient(135deg, #001f3f 0%, #003d7a 58%, #0056b3 100%);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+            text-align: left;
+        }
+
+        .brand-block {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 250px;
+        }
+
+        .header img {
+            width: 42px !important;
+            height: 42px !important;
+            margin: 0 !important;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.12);
+            padding: 5px;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: white;
+            font-size: 1.08rem;
+            letter-spacing: 0;
+            white-space: nowrap;
+        }
+
+        .header p {
+            margin-top: 2px;
+            color: rgba(255, 255, 255, 0.76);
+            font-size: 0.76rem;
+            opacity: 1;
+        }
+
+        .top-nav {
+            display: flex;
+            align-items: center;
+            gap: 34px;
+            height: 100%;
+            color: rgba(255, 255, 255, 0.72);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .top-nav button {
+            display: flex;
+            align-items: center;
+            height: 100%;
+            min-height: 100%;
+            padding: 0;
+            color: inherit;
+            background: transparent;
+            border: 0;
+            border-radius: 0;
+            border-top: 3px solid transparent;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .top-nav .active {
+            color: white;
+            border-top-color: white;
+        }
+
+        .top-nav button:hover {
+            color: white;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: rgba(255, 255, 255, 0.76);
+            font-size: 0.84rem;
+            white-space: nowrap;
+        }
+
+        .app-body {
+            display: grid;
+            grid-template-columns: 260px minmax(0, 1fr);
+            min-height: 0;
+            background: var(--soft);
+        }
+
+        .sidebar {
+            border-right: 1px solid var(--line);
+            background: #fbfdff;
+            padding: 22px 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px 12px;
+            color: var(--ink);
+            font-size: 1rem;
+            font-weight: 800;
+        }
+
+        .sidebar-section-label {
+            padding: 16px 20px 8px;
+            color: var(--muted);
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .stats-grid {
+            display: block;
+            margin: 0;
+        }
+
+        .stat-card {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 20px;
+            color: var(--ink);
+            background: transparent;
+            border-radius: 0;
+            text-align: left;
+            border-left: 3px solid transparent;
+        }
+
+        .stat-card:first-child {
+            background: #eef6fb;
+            border-left-color: var(--brand);
+        }
+
+        .stat-card h3 {
+            order: 2;
+            margin: 0;
+            color: var(--brand);
+            font-size: 1rem;
+            font-weight: 800;
+        }
+
+        .stat-card p {
+            margin: 0;
+            color: var(--ink);
+            font-size: 0.86rem;
+            opacity: 1;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-rows: auto auto auto minmax(0, 1fr);
+            gap: 18px;
+            min-width: 0;
+            padding: 26px 30px 30px;
+            overflow-x: hidden;
+            overflow-y: visible;
+            background: #f7fafc;
+        }
+
+        .workspace-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .workspace-heading h2 {
+            color: var(--ink);
+            font-size: 1.25rem;
+            letter-spacing: 0;
+        }
+
+        .workspace-subtitle {
+            margin-top: 3px;
+            color: var(--muted);
+            font-size: 0.84rem;
+        }
+
+        .form-section {
+            margin: 0;
+            padding: 18px;
+            background: var(--panel) !important;
+            border: 1px solid var(--line) !important;
+            border-radius: 6px;
+            box-shadow: 0 12px 28px rgba(24, 54, 77, 0.05);
+        }
+
+        .form-section h2 {
+            margin-bottom: 14px !important;
+            color: var(--ink) !important;
+            font-size: 1rem;
+        }
+
+        .export-panel {
+            padding: 12px 14px;
+        }
+
+        .export-panel h2 {
+            display: none;
+        }
+
+        .form-grid {
+            grid-template-columns: repeat(4, minmax(170px, 1fr));
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            margin-bottom: 6px;
+            color: var(--muted);
+            font-size: 0.74rem;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+        }
+
+        .form-group input,
+        .form-group select,
+        .search-box {
+            width: 100%;
+            min-height: 38px;
+            padding: 9px 11px;
+            color: var(--ink);
+            background: #f9fcff;
+            border: 1px solid #cfdde8;
+            border-radius: 5px;
+            font-size: 0.86rem;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .search-box:focus {
+            border-color: var(--accent);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(11, 120, 168, 0.12);
+        }
+
+        .button-group {
+            flex-wrap: wrap;
+            gap: 9px;
+            margin-top: 12px;
+        }
+
+        button {
+            min-height: 36px;
+            padding: 8px 13px;
+            border-radius: 5px;
+            font-size: 0.84rem;
+            font-weight: 800;
+            box-shadow: none;
+        }
+
+        .btn-primary,
+        .btn-success,
+        .btn-secondary {
+            background: var(--brand);
+            color: white;
+        }
+
+        .btn-primary:hover,
+        .btn-success:hover,
+        .btn-secondary:hover {
+            background: var(--brand-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(0, 61, 122, 0.16);
+        }
+
+        .btn-secondary {
+            background: #e9f1f7;
+            color: var(--brand-dark);
+        }
+
+        .table-section {
+            min-width: 0;
+            margin: 0;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            box-shadow: 0 12px 28px rgba(24, 54, 77, 0.05);
+            overflow: hidden;
+        }
+
+        .table-header {
+            gap: 16px;
+            margin: 0;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .table-header h2 {
+            color: var(--ink);
+            font-size: 1.02rem;
+            white-space: nowrap;
+        }
+
+        .table-tools {
+            display: flex;
+            gap: 10px;
+            width: min(520px, 100%);
+        }
+
+        .table-tools #yearFilter {
+            max-width: 160px;
+        }
+
+        .table-container {
+            overflow-x: hidden;
+            overflow-y: visible;
+            border: 0;
+            border-radius: 0;
+        }
+
+        table {
+            table-layout: fixed;
+            font-size: 0.82rem;
+        }
+
+        thead {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            color: #335063;
+            background: #eef5fa;
+        }
+
+        th {
+            padding: 11px 10px;
+            color: #335063;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--line);
+        }
+
+        td {
+            padding: 10px;
+            color: #29475a;
+            border-bottom: 1px solid #e8f0f5;
+            vertical-align: middle;
+            overflow-wrap: anywhere;
+        }
+
+        th:first-child,
+        td:first-child {
+            width: 46px;
+        }
+
+        th:nth-child(6),
+        td:nth-child(6),
+        th:nth-child(8),
+        td:nth-child(8),
+        th:nth-child(9),
+        td:nth-child(9) {
+            width: 96px;
+        }
+
+        th:last-child,
+        td:last-child {
+            width: 132px;
+        }
+
+        .table-pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 12px 16px;
+            color: var(--muted);
+            background: white;
+            border-top: 1px solid var(--line);
+            font-size: 0.8rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .pagination-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: auto;
+            min-width: 32px;
+            min-height: 30px;
+            padding: 6px 10px;
+            color: var(--brand-dark);
+            background: #f4f8fb;
+            border: 1px solid #d5e3ed;
+            border-radius: 4px;
+            font-size: 0.78rem;
+            font-weight: 800;
+        }
+
+        .pagination-btn:hover:not(:disabled),
+        .pagination-btn.active {
+            color: white;
+            background: var(--brand);
+            border-color: var(--brand);
+            transform: none;
+            box-shadow: none;
+        }
+
+        .pagination-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.45;
+        }
+
+        .pagination-gap {
+            display: inline-flex;
+            align-items: center;
+            min-height: 30px;
+            padding: 0 4px;
+            color: var(--muted);
+            font-weight: 800;
+        }
+
+        tbody tr:hover {
+            background: #f6fbff;
+        }
+
+        .reward-badge {
+            padding: 4px 9px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+        }
+
+        .reward-yes {
+            background: #d9edf7;
+            color: #075777;
+        }
+
+        .reward-no {
+            background: #edf1f4;
+            color: #617281;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            min-height: 28px;
+            margin: 0 4px 4px 0;
+            padding: 5px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        .btn-edit {
+            background: #e5f1f8;
+            color: #075777;
+        }
+
+        .btn-delete {
+            background: #f1f4f7;
+            color: #4b6273;
+        }
+
+        .carousel-section {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            border-radius: 0;
+            box-shadow: none;
+            animation: none;
+        }
+
+        .carousel-title {
+            margin: 0;
+            padding: 16px 20px 8px;
+            color: var(--muted);
+            text-align: left;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-shadow: none;
+            text-transform: uppercase;
+        }
+
+        .carousel-container {
+            margin: 0 12px;
+            border-radius: 0;
+        }
+
+        .carousel-wrapper {
+            display: block;
+        }
+
+        .carousel-item {
+            display: grid;
+            grid-template-columns: 30px 1fr;
+            gap: 4px 8px;
+            margin-bottom: 6px;
+            padding: 10px 8px;
+            border: 0;
+            border-radius: 5px;
+            box-shadow: none;
+            text-align: left;
+            background: transparent;
+        }
+
+        .carousel-item:hover {
+            transform: none;
+            border-color: transparent;
+            background: #eef6fb;
+            box-shadow: none;
+        }
+
+        .carousel-item::before {
+            display: none;
+        }
+
+        .carousel-rank {
+            grid-row: span 3;
+            margin: 0;
+            color: var(--brand);
+            font-size: 0.84rem;
+            animation: none;
+        }
+
+        .referrer-lottie {
+            grid-row: span 3;
+            width: 28px;
+            height: 28px;
+            align-self: start;
+        }
+
+        .carousel-name {
+            margin: 0;
+            color: var(--ink);
+            background: none;
+            -webkit-text-fill-color: currentColor;
+            font-size: 0.86rem;
+            letter-spacing: 0;
+        }
+
+        .carousel-stat {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.73rem;
+        }
+
+        .carousel-stat strong {
+            color: var(--brand);
+            font-size: 0.9rem;
+        }
+
+        .app-footer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 40px;
+            min-height: 58px;
+            padding: 10px 16px;
+            color: white;
+            background: var(--brand-dark);
+            font-size: 0.78rem;
+        }
+
+        .footer-brand {
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+        }
+
+        .modal-content {
+            border-radius: 6px;
+        }
+
+        .toast {
+            top: 86px;
+            background: var(--brand);
+            border-radius: 5px;
+        }
+
+        .scroll-btn {
+            width: 38px;
+            height: 38px;
+            right: 22px;
+            background: var(--brand);
+            box-shadow: 0 8px 18px rgba(0, 61, 122, 0.18);
+            font-size: 1rem;
+        }
+
+        @media (max-width: 980px) {
+            .container {
+                grid-template-rows: auto 1fr 58px;
+            }
+
+            .header {
+                flex-wrap: wrap;
+                height: auto;
+                padding: 14px 18px;
+            }
+
+            .top-nav {
+                order: 3;
+                width: 100%;
+                height: auto;
+                gap: 18px;
+                flex-wrap: wrap;
+                overflow-x: hidden;
+            }
+
+            .top-nav span {
+                height: 32px;
+            }
+
+            .app-body {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                border-right: 0;
+                border-bottom: 1px solid var(--line);
+            }
+
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .carousel-section {
+                display: none;
+            }
+
+            .main-content {
+                padding: 18px;
+            }
+
+            .form-grid {
+                grid-template-columns: repeat(2, minmax(160px, 1fr));
+            }
+        }
+
+        @media (max-width: 640px) {
+            .header h1 {
+                white-space: normal;
+            }
+
+            .user-menu {
+                display: none;
+            }
+
+            .stats-grid,
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .workspace-heading,
+            .table-header {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .table-tools {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .table-tools #yearFilter {
+                max-width: none;
+            }
+
+            .button-group,
+            .export-panel .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                justify-content: center;
+                width: 100%;
+            }
+        }
+
+        /* Single-workspace layout: no side menu. */
+        .app-body {
+            display: block;
+            min-height: 0;
+            background: #f7fafc;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-rows: auto auto auto auto auto minmax(0, 1fr);
+            gap: 16px;
+            width: min(1440px, 100%);
+            margin: 0 auto;
+            padding: 24px 30px 30px;
+        }
+
+        .workspace-heading {
+            padding-bottom: 2px;
+            order: 2;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            order: 3;
+        }
+
+        .stat-card,
+        .stat-card:first-child {
+            display: grid;
+            grid-template-columns: 1fr;
+            align-items: center;
+            padding: 16px 18px;
+            background: linear-gradient(180deg, #f8fbff 0%, #ffffff 58%);
+            border: 1px solid #e3edf5;
+            border-radius: 6px;
+            box-shadow: 0 10px 22px rgba(24, 54, 77, 0.06);
+        }
+
+        .stat-copy {
+            min-width: 0;
+        }
+
+        .lottie-icon {
+            width: 48px;
+            height: 48px;
+            justify-self: end;
+        }
+
+        .stat-card h3 {
+            margin-bottom: 4px;
+            color: var(--brand);
+            font-size: 1.55rem;
+            line-height: 1;
+        }
+
+        .stat-card p {
+            color: var(--muted);
+            font-size: 0.82rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .carousel-section {
+            padding: 14px 16px;
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            box-shadow: 0 10px 24px rgba(24, 54, 77, 0.05);
+            order: 4;
+        }
+
+        .carousel-title {
+            padding: 0 0 12px;
+            color: var(--ink);
+            font-size: 0.96rem;
+            letter-spacing: 0;
+            text-transform: none;
+        }
+
+        .carousel-container {
+            margin: 0;
+            position: relative;
+            overflow: hidden;
+            padding: 0 42px;
+        }
+
+        .carousel-wrapper {
+            display: flex;
+            gap: 10px;
+            transition: transform 0.45s ease;
+        }
+
+        .carousel-item {
+            flex: 0 0 calc(25% - 8px);
+            margin: 0;
+            padding: 12px;
+            background: #f8fbfe;
+            border: 1px solid #e3edf4;
+        }
+
+        .carousel-item:hover {
+            background: #eef6fb;
+        }
+
+        .carousel-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 50%;
+            z-index: 5;
+            width: 32px;
+            height: 32px;
+            min-height: 32px;
+            padding: 0;
+            color: var(--brand-dark);
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: 50%;
+            box-shadow: 0 8px 18px rgba(24, 54, 77, 0.08);
+            transform: translateY(-50%);
+        }
+
+        .carousel-nav:hover {
+            color: white;
+            background: var(--brand);
+            transform: translateY(-50%);
+            box-shadow: 0 10px 22px rgba(0, 61, 122, 0.18);
+        }
+
+        .carousel-prev {
+            left: 2px;
+        }
+
+        .carousel-next {
+            right: 2px;
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 7px;
+            padding-top: 12px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border: 1px solid #b9cbd9;
+            background: #d9e5ee;
+        }
+
+        .dot:hover {
+            background: #b8d0e1;
+            transform: none;
+        }
+
+        .dot.active {
+            width: 24px;
+            background: var(--brand);
+            border-color: var(--brand);
+            box-shadow: none;
+        }
+
+        @media (max-width: 1200px) {
+            .carousel-item {
+                flex-basis: calc(33.333% - 7px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .carousel-item {
+                flex-basis: calc(50% - 5px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .carousel-container {
+                padding: 0 36px;
+            }
+
+            .carousel-item {
+                flex-basis: 100%;
+            }
+        }
+
+        @media (max-width: 980px) {
+            .main-content {
+                padding: 18px;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-pagination {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .pagination-controls {
+                justify-content: flex-start;
+            }
+
+            .pagination-controls .pagination-btn {
+                width: auto;
+            }
+        }
+
+        .table-section {
+            order: 6;
+            max-width: 100%;
+            min-width: 0;
+        }
+
+        .export-panel {
+            order: 4;
+        }
+
+        .form-section:not(.export-panel) {
+            order: 5;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <img src="White IOD_Logo_png.png" height="90px" width="90px" alt="IoD Logo" style="margin-bottom: 15px;">
-            <h1>Institute of Directors-Ghana</h1>
-            <p>Membership Referral Tracking System</p>
+            <div class="brand-block">
+                <img src="White IOD_Logo_png.png" height="90px" width="90px" alt="IoD Logo" style="margin-bottom: 15px;">
+                <div>
+                    <h1>Institute of Directors-Ghana</h1>
+                    <p>Membership Referral Tracking System</p>
+                </div>
+            </div>
+            <nav class="top-nav" aria-label="Primary">
+                <button type="button" onclick="scrollToSection('dashboardSection')">Dashboard</button>
+                <button type="button" onclick="scrollToSection('statsSection')">Rewards</button>
+                <button type="button" class="active" onclick="scrollToSection('referralFormSection')">Referrals</button>
+                <button type="button" onclick="scrollToSection('recordsSection')">Reports</button>
+            </nav>
         </div>
 
-        <div class="main-content">
-            <div class="carousel-section">
-                <h2 class="carousel-title">🏆 Top Referrers Leaderboard</h2>
-                <div class="carousel-container">
-                    <div class="carousel-wrapper" id="carouselWrapper">
-                        <!-- Carousel items will be populated by JavaScript -->
+        <div class="app-body">
+            <main class="main-content">
+                <div class="workspace-heading" id="dashboardSection">
+                    <div>
+                        <h2>Referral Contacts</h2>
+                        <p class="workspace-subtitle">Track member referrals, admission year, reward status, and Google Sheets sync.</p>
                     </div>
-                    <button class="carousel-nav carousel-prev" onclick="prevCarouselSlide()">‹</button>
-                    <button class="carousel-nav carousel-next" onclick="nextCarouselSlide()">›</button>
                 </div>
-                <div class="carousel-dots" id="carouselDots"></div>
-            </div>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h3 id="totalReferrals">0</h3>
-                    <p>Total Referrals</p>
+
+                <div class="stats-grid" id="statsSection">
+                    <div class="stat-card">
+                        <div class="stat-copy">
+                            <h3 id="totalReferrals">0</h3>
+                            <p>Total Referrals</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-copy">
+                            <h3 id="rewardsGiven">0</h3>
+                            <p>Rewards Given</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-copy">
+                            <h3 id="pendingRewards">0</h3>
+                            <p>Pending Rewards</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <h3 id="rewardsGiven">0</h3>
-                    <p>Rewards Given</p>
+
+                <div class="carousel-section">
+                    <h2 class="carousel-title">Top Referrers</h2>
+                    <div class="carousel-container">
+                        <div class="carousel-wrapper" id="carouselWrapper">
+                            <!-- Carousel items will be populated by JavaScript -->
+                        </div>
+                        <button class="carousel-nav carousel-prev" onclick="prevCarouselSlide()">‹</button>
+                        <button class="carousel-nav carousel-next" onclick="nextCarouselSlide()">›</button>
+                    </div>
+                    <div class="carousel-dots" id="carouselDots"></div>
                 </div>
-                <div class="stat-card">
-                    <h3 id="pendingRewards">0</h3>
-                    <p>Pending Rewards</p>
+
+            <div class="table-section" id="recordsSection">
+                <div class="table-header">
+                    <h2>Referral Records</h2>
+                    <div class="table-tools">
+                        <select id="yearFilter" class="search-box" onchange="filterTable(true)">
+                            <option value="">🗓️ All Years</option>
+                        </select>
+                        <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search referrals...">
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Referrer Name/Recommending Agent</th>
+                                <th>Membership Number</th>
+                                <th>Referred Member Name</th>
+                                <th>Referred Membership No.</th>
+                                <th>Admission Year</th>
+                                <th>Referred Email</th>
+                                <th>Reward given (Yes/No)</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="referralTableBody">
+                            <tr>
+                                <td colspan="10" class="empty-state">
+                                    <p>No referrals added yet. Start by adding your first referral above!</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-pagination" id="referralPagination">
+                    <span id="paginationSummary">Showing 0 records</span>
+                    <div class="pagination-controls" id="paginationControls"></div>
                 </div>
             </div>
 
-            <div class="form-section" style="background: linear-gradient(135deg, #001f3f 0%, #003d7a 100%); border-color: #001f3f;">
-                <h2 style="margin-bottom: 15px; color: white;">Export Data</h2>
-                <div class="button-group" style="margin: 0;">
+            <div class="form-section export-panel">
+                <h2>Export Data</h2>
+                <div class="button-group">
                     <button class="btn-primary" onclick="refreshData()">
                         🔄 Refresh Data
                     </button>
@@ -614,7 +1622,7 @@
                 </div>
             </div>
 
-            <div class="form-section">
+            <div class="form-section" id="referralFormSection">
                 <h2>Add New Referral</h2>
                 <form id="referralForm">
                     <div class="form-grid">
@@ -661,44 +1669,11 @@
                     </div>
                 </form>
             </div>
-
-            <div class="table-section">
-                <div class="table-header">
-                    <h2>Referral Records</h2>
-                    <div style="display: flex; gap: 10px;">
-                        <select id="yearFilter" class="search-box" style="width: auto; flex: 1; max-width: 200px;" onchange="filterTable()">
-                            <option value="">🗓️ All Years</option>
-                        </select>
-                        <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search referrals..." style="flex: 1;">
-                    </div>
-                </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Referrer Name/Recommending Agent</th>
-                                <th>Membership Number</th>
-                                <th>Referred Member Name</th>
-                                <th>Referred Membership No.</th>
-                                <th>Admission Year</th>
-                                <th>Referred Email</th>
-                                <th>Reward given (Yes/No)</th>
-                                <th>Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="referralTableBody">
-                            <tr>
-                                <td colspan="10" class="empty-state">
-                                    <p>No referrals added yet. Start by adding your first referral above!</p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            </main>
         </div>
+        <footer class="app-footer">
+            <span>© Copyright 2026 Institute of Directors-Ghana</span> 
+        </footer>
     </div>
 
     <div id="editModal" class="modal">
@@ -757,14 +1732,15 @@
 
     <script>
         // Google Sheets Configuration
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyQRfh373mUpvhL__r-DJLkKE087YLug9MKL1KbERyoTOFf0tLf-Zgcgu8Wn_SFLwU/exec'; // Paste your Google Apps Script Web App URL here
-        
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw1W6reLzlsUk9sJgncZIuAokAgSHqEjII4pJxF0XOdgwgHUzTm6Ifw7AASqp6ZGg9A/exec';
         let referrals = [];
         let editingIndex = -1;
         let isSyncing = false;
         let isLoading = true;
         let carouselIndex = 0;
         let carouselAutoRotate;
+        const REFERRALS_PER_PAGE = 10;
+        let currentReferralPage = 1;
 
         // Carousel Functions
         function getTopReferrers() {
@@ -935,6 +1911,23 @@
             renderCarousel();
         }
 
+        function shouldUseOfflineFallback() {
+            return !GOOGLE_SCRIPT_URL ||
+                GOOGLE_SCRIPT_URL === 'YOUR_SCRIPT_URL_HERE' ||
+                !navigator.onLine;
+        }
+
+        async function parseGoogleSheetsResponse(response) {
+            const rawResponse = await response.text();
+
+            try {
+                return JSON.parse(rawResponse);
+            } catch (error) {
+                const preview = rawResponse.trim().slice(0, 120) || response.statusText;
+                throw new Error(`Unexpected response from Google Sheets: ${preview}`);
+            }
+        }
+
         async function syncToGoogleSheets(action, data) {
             if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === 'YOUR_SCRIPT_URL_HERE') {
                 console.warn('❌ Google Sheets URL not configured. Using offline mode.');
@@ -944,22 +1937,24 @@
 
             try {
                 console.log(`📤 Sending ${action} request to Google Sheets...`, data);
+                // Apps Script rejects the browser's JSON preflight request, so send the same
+                // payload as text/plain to keep this a simple CORS request.
                 const response = await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'text/plain;charset=utf-8',
                     },
                     body: JSON.stringify({ action, ...data })
                 });
-                
-                // Check if response is ok
+
+                const result = await parseGoogleSheetsResponse(response);
+
                 if (!response.ok) {
                     console.error(`❌ HTTP Error: ${response.status} ${response.statusText}`);
-                    showToast(`❌ Failed: HTTP ${response.status}`);
+                    showToast(`❌ Failed: ${result.message || `HTTP ${response.status}`}`);
                     return false;
                 }
-                
-                const result = await response.json();
+
                 console.log('✅ Google Sheets Response:', result);
                 
                 if (result.status === 'success') {
@@ -973,7 +1968,10 @@
             } catch (error) {
                 console.error('❌ Error syncing to Google Sheets:', error.message);
                 console.error('Full error:', error);
-                showToast(`❌ Sync failed: ${error.message}`);
+                const userMessage = error.message === 'Failed to fetch'
+                    ? 'Browser blocked the request before it reached Google Sheets'
+                    : error.message;
+                showToast(`❌ Sync failed: ${userMessage}`);
                 return false;
             }
         }
@@ -990,8 +1988,10 @@
             showToast('Syncing to Google Sheets...');
 
             try {
-                await syncToGoogleSheets('sync', { referrals });
-                showToast('✅ Successfully synced to Google Sheets!');
+                const synced = await syncToGoogleSheets('sync', { referrals });
+                showToast(synced
+                    ? '✅ Successfully synced to Google Sheets!'
+                    : '❌ Google Sheets sync failed');
             } catch (error) {
                 showToast('❌ Error syncing to Google Sheets');
             } finally {
@@ -1032,11 +2032,13 @@
             yearFilter.value = currentValue;
         }
 
-        function filterTable() {
+        function filterTable(resetPage = false) {
             const searchValue = document.getElementById('searchBox').value;
             const yearValue = document.getElementById('yearFilter').value;
             
             const tbody = document.getElementById('referralTableBody');
+            const paginationSummary = document.getElementById('paginationSummary');
+            const paginationControls = document.getElementById('paginationControls');
             const filtered = referrals.filter(r => {
                 const matchesSearch = r.referrerName.toLowerCase().includes(searchValue.toLowerCase()) ||
                     r.membershipNumber.toLowerCase().includes(searchValue.toLowerCase()) ||
@@ -1050,6 +2052,10 @@
                 return matchesSearch && matchesYear;
             });
 
+            if (resetPage) {
+                currentReferralPage = 1;
+            }
+
             if (filtered.length === 0) {
                 tbody.innerHTML = `
                     <tr>
@@ -1058,12 +2064,19 @@
                         </td>
                     </tr>
                 `;
+                paginationSummary.textContent = 'Showing 0 records';
+                paginationControls.innerHTML = '';
                 return;
             }
 
-            tbody.innerHTML = filtered.map((r, i) => `
+            const pageCount = Math.ceil(filtered.length / REFERRALS_PER_PAGE);
+            currentReferralPage = Math.min(Math.max(currentReferralPage, 1), pageCount);
+            const startIndex = (currentReferralPage - 1) * REFERRALS_PER_PAGE;
+            const visibleReferrals = filtered.slice(startIndex, startIndex + REFERRALS_PER_PAGE);
+
+            tbody.innerHTML = visibleReferrals.map((r, i) => `
                 <tr>
-                    <td>${referrals.indexOf(r) + 1}</td>
+                    <td>${startIndex + i + 1}</td>
                     <td>${r.referrerName}</td>
                     <td>${r.membershipNumber || '-'}</td>
                     <td>${r.referredName}</td>
@@ -1078,6 +2091,56 @@
                     </td>
                 </tr>
             `).join('');
+
+            renderReferralPagination(filtered.length, pageCount, startIndex, visibleReferrals.length);
+        }
+
+        function renderReferralPagination(totalRecords, pageCount, startIndex, visibleCount) {
+            const paginationSummary = document.getElementById('paginationSummary');
+            const paginationControls = document.getElementById('paginationControls');
+            const firstRecord = startIndex + 1;
+            const lastRecord = startIndex + visibleCount;
+
+            paginationSummary.textContent = `Showing ${firstRecord}-${lastRecord} of ${totalRecords} records`;
+
+            if (pageCount <= 1) {
+                paginationControls.innerHTML = '';
+                return;
+            }
+
+            const pages = getVisibleReferralPages(pageCount);
+            paginationControls.innerHTML = `
+                <button class="pagination-btn" onclick="goToReferralPage(${currentReferralPage - 1})" ${currentReferralPage === 1 ? 'disabled' : ''}>Previous</button>
+                ${pages.map(page => page === 'gap'
+                    ? '<span class="pagination-gap">...</span>'
+                    : `<button class="pagination-btn ${page === currentReferralPage ? 'active' : ''}" onclick="goToReferralPage(${page})">${page}</button>`
+                ).join('')}
+                <button class="pagination-btn" onclick="goToReferralPage(${currentReferralPage + 1})" ${currentReferralPage === pageCount ? 'disabled' : ''}>Next</button>
+            `;
+        }
+
+        function getVisibleReferralPages(pageCount) {
+            if (pageCount <= 7) {
+                return Array.from({ length: pageCount }, (_, i) => i + 1);
+            }
+
+            const pages = [1];
+            const start = Math.max(2, currentReferralPage - 1);
+            const end = Math.min(pageCount - 1, currentReferralPage + 1);
+
+            if (start > 2) pages.push('gap');
+            for (let page = start; page <= end; page++) {
+                pages.push(page);
+            }
+            if (end < pageCount - 1) pages.push('gap');
+            pages.push(pageCount);
+
+            return pages;
+        }
+
+        function goToReferralPage(page) {
+            currentReferralPage = page;
+            filterTable();
         }
 
         function renderTable(filter = '') {
@@ -1099,21 +2162,24 @@
                 dateAdded: new Date().toLocaleDateString()
             };
 
-            // Add to Google Sheets
-            const synced = await syncToGoogleSheets('add', { referral });
+            // Use bulk sync for single adds because older Apps Script deployments may
+            // reject the dedicated "add" action even though sync works correctly.
+            const synced = await syncToGoogleSheets('sync', { referrals: [referral] });
             
             if (synced) {
                 // Reload from Google Sheets to get updated data
                 await loadFromGoogleSheets();
                 showToast('Referral added successfully!');
-            } else {
-                // Fallback to local storage
+                clearForm();
+            } else if (shouldUseOfflineFallback()) {
+                // Fallback to local storage only when the app is intentionally offline
                 referrals.push(referral);
                 saveToStorage();
-                showToast('Referral added (offline mode)');
+                showToast('Saved locally only. Re-sync when back online.');
+                clearForm();
+            } else {
+                showToast('❌ Not saved to Google Sheets. Check the Apps Script deployment and try again.');
             }
-            
-            clearForm();
         });
 
         document.getElementById('editForm').addEventListener('submit', async function(e) {
@@ -1137,14 +2203,16 @@
                 // Reload from Google Sheets
                 await loadFromGoogleSheets();
                 showToast('Referral updated successfully!');
-            } else {
-                // Fallback to local storage
+                closeEditModal();
+            } else if (shouldUseOfflineFallback()) {
+                // Fallback to local storage only when the app is intentionally offline
                 referrals[editingIndex] = updatedReferral;
                 saveToStorage();
-                showToast('Referral updated (offline mode)');
+                showToast('Saved locally only. Re-sync when back online.');
+                closeEditModal();
+            } else {
+                showToast('❌ Update failed before saving to Google Sheets.');
             }
-            
-            closeEditModal();
         });
 
         function editReferral(index) {
@@ -1174,11 +2242,13 @@
                     // Reload from Google Sheets
                     await loadFromGoogleSheets();
                     showToast('Referral deleted successfully!');
-                } else {
-                    // Fallback to local storage
+                } else if (shouldUseOfflineFallback()) {
+                    // Fallback to local storage only when the app is intentionally offline
                     referrals.splice(index, 1);
                     saveToStorage();
-                    showToast('Referral deleted (offline mode)');
+                    showToast('Saved locally only. Re-sync when back online.');
+                } else {
+                    showToast('❌ Delete failed before saving to Google Sheets.');
                 }
             }
         }
@@ -1197,7 +2267,7 @@
         }
 
         document.getElementById('searchBox').addEventListener('input', function(e) {
-            filterTable();
+            filterTable(true);
         });
 
         function exportToCSV() {
@@ -1269,6 +2339,7 @@
 
         // Load data from Google Sheets on page load
         loadFromGoogleSheets();
+        initLottieIcons();
 
         // Scroll button functionality
         const scrollUpBtn = document.getElementById('scrollUpBtn');
@@ -1313,6 +2384,171 @@
                 top: document.documentElement.scrollHeight,
                 behavior: 'smooth'
             });
+        }
+
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (!section) return;
+
+            section.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+
+        function renderCarousel() {
+            const topReferrers = getTopReferrers();
+            const wrapper = document.getElementById('carouselWrapper');
+            const dotsContainer = document.getElementById('carouselDots');
+
+            if (topReferrers.length === 0) {
+                wrapper.innerHTML = '<div style="text-align:center;padding:40px;width:100%;">No referral data yet</div>';
+                dotsContainer.innerHTML = '';
+                return;
+            }
+
+            wrapper.innerHTML = topReferrers.map((referrer, index) => `
+                <div class="carousel-item">
+                    <div class="referrer-lottie" data-referrer-lottie="${index}" aria-hidden="true"></div>
+                    <div class="carousel-name">${referrer.name}</div>
+                    <div class="carousel-stat">Total Referrals: <strong>${referrer.total}</strong></div>
+                    <div class="carousel-stat">Rewards Given: <strong>${referrer.rewards}</strong></div>
+                </div>
+            `).join('');
+            initTopReferrerLotties();
+
+            const itemsPerView = window.innerWidth > 1200 ? 4 : window.innerWidth > 768 ? 3 : window.innerWidth > 480 ? 2 : 1;
+            const dotCount = Math.ceil(topReferrers.length / itemsPerView);
+            dotsContainer.innerHTML = Array(dotCount).fill(0).map((_, i) => `
+                <div class="dot ${i === 0 ? 'active' : ''}" onclick="goToCarouselSlide(${i})"></div>
+            `).join('');
+        }
+
+        function initTopReferrerLotties(attempt = 0) {
+            if (!window.lottie) {
+                if (attempt < 20) {
+                    setTimeout(() => initTopReferrerLotties(attempt + 1), 150);
+                }
+                return;
+            }
+
+            document.querySelectorAll('[data-referrer-lottie]').forEach(icon => {
+                icon.innerHTML = '';
+                lottie.loadAnimation({
+                    container: icon,
+                    renderer: 'svg',
+                    loop: true,
+                    autoplay: true,
+                    animationData: buildPulseIcon('#003d7a', '#e5f4fb')
+                });
+            });
+        }
+
+        function initLottieIcons(attempt = 0) {
+            if (!window.lottie) {
+                if (attempt < 20) {
+                    setTimeout(() => initLottieIcons(attempt + 1), 150);
+                }
+                return;
+            }
+
+            const iconColors = {
+                records: ['#003d7a', '#d9edf7'],
+                reward: ['#0b78a8', '#e5f4fb'],
+                pending: ['#5d7080', '#eef3f7']
+            };
+
+            document.querySelectorAll('[data-lottie-icon]').forEach(icon => {
+                const [primary, secondary] = iconColors[icon.dataset.lottieIcon] || iconColors.records;
+                lottie.loadAnimation({
+                    container: icon,
+                    renderer: 'svg',
+                    loop: true,
+                    autoplay: true,
+                    animationData: buildPulseIcon(primary, secondary)
+                });
+            });
+        }
+
+        function hexToLottieColor(hex) {
+            const cleanHex = hex.replace('#', '');
+            return [
+                parseInt(cleanHex.slice(0, 2), 16) / 255,
+                parseInt(cleanHex.slice(2, 4), 16) / 255,
+                parseInt(cleanHex.slice(4, 6), 16) / 255,
+                1
+            ];
+        }
+
+        function buildPulseIcon(primary, secondary) {
+            const primaryColor = hexToLottieColor(primary);
+            const secondaryColor = hexToLottieColor(secondary);
+
+            return {
+                v: '5.7.4',
+                fr: 30,
+                ip: 0,
+                op: 60,
+                w: 64,
+                h: 64,
+                nm: 'Dashboard Icon',
+                ddd: 0,
+                assets: [],
+                layers: [
+                    {
+                        ddd: 0,
+                        ind: 1,
+                        ty: 4,
+                        nm: 'soft pulse',
+                        sr: 1,
+                        ks: {
+                            o: { a: 1, k: [{ t: 0, s: [55], e: [85] }, { t: 30, s: [85], e: [55] }, { t: 60, s: [55] }] },
+                            r: { a: 0, k: 0 },
+                            p: { a: 0, k: [32, 32, 0] },
+                            a: { a: 0, k: [0, 0, 0] },
+                            s: { a: 1, k: [{ t: 0, s: [92, 92, 100], e: [108, 108, 100] }, { t: 30, s: [108, 108, 100], e: [92, 92, 100] }, { t: 60, s: [92, 92, 100] }] }
+                        },
+                        shapes: [{
+                            ty: 'gr',
+                            it: [
+                                { ty: 'el', p: { a: 0, k: [0, 0] }, s: { a: 0, k: [44, 44] } },
+                                { ty: 'fl', c: { a: 0, k: secondaryColor }, o: { a: 0, k: 100 } },
+                                { ty: 'tr', p: { a: 0, k: [0, 0] }, a: { a: 0, k: [0, 0] }, s: { a: 0, k: [100, 100] }, r: { a: 0, k: 0 }, o: { a: 0, k: 100 } }
+                            ]
+                        }],
+                        ip: 0,
+                        op: 60,
+                        st: 0,
+                        bm: 0
+                    },
+                    {
+                        ddd: 0,
+                        ind: 2,
+                        ty: 4,
+                        nm: 'mark',
+                        sr: 1,
+                        ks: {
+                            o: { a: 0, k: 100 },
+                            r: { a: 1, k: [{ t: 0, s: [0], e: [8] }, { t: 30, s: [8], e: [0] }, { t: 60, s: [0] }] },
+                            p: { a: 0, k: [32, 32, 0] },
+                            a: { a: 0, k: [0, 0, 0] },
+                            s: { a: 0, k: [100, 100, 100] }
+                        },
+                        shapes: [{
+                            ty: 'gr',
+                            it: [
+                                { ty: 'rc', p: { a: 0, k: [0, 0] }, s: { a: 0, k: [24, 28] }, r: { a: 0, k: 5 } },
+                                { ty: 'st', c: { a: 0, k: primaryColor }, o: { a: 0, k: 100 }, w: { a: 0, k: 5 }, lc: 2, lj: 2 },
+                                { ty: 'tr', p: { a: 0, k: [0, 0] }, a: { a: 0, k: [0, 0] }, s: { a: 0, k: [100, 100] }, r: { a: 0, k: 0 }, o: { a: 0, k: 100 } }
+                            ]
+                        }],
+                        ip: 0,
+                        op: 60,
+                        st: 0,
+                        bm: 0
+                    }
+                ]
+            };
         }
     </script>
 </body>
