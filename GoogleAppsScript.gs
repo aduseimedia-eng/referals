@@ -52,6 +52,19 @@ function normalizeYesNo(value) {
   return String(value || '').trim().toLowerCase() === 'yes' ? 'Yes' : 'No';
 }
 
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu('Referral Tracker')
+    .addItem('Set up columns', 'setupReferralSheetColumns')
+    .addToUi();
+}
+
+function setupReferralSheetColumns() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  ensureHeaders(sheet);
+  return `Referral Tracker columns are ready on "${sheet.getName()}".`;
+}
+
 function ensureHeaders(sheet) {
   const headers = ['No.', 'Referrer Name/Recommending Agent', 'Membership Number', 'Referred Member Name', 'Referred Membership No.', 'Admission Year', 'Referred Email', 'Reward Status', 'Date', 'Reward Amount', 'Reward Date', 'Admission Fee Paid', 'Admission Fee Date'];
 
@@ -66,6 +79,11 @@ function ensureHeaders(sheet) {
       sheet.getRange(1, index + 1).setValue(header);
     }
   });
+
+  sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
+  sheet.setFrozenRows(1);
+  sheet.showColumns(1, headers.length);
+  sheet.autoResizeColumns(1, headers.length);
 }
 
 function syncAllData(sheet, referrals) {
