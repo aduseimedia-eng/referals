@@ -13,10 +13,10 @@
 function doPost(e) {
   try {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    
+
     // Parse the incoming data
     const data = JSON.parse(e.postData.contents);
-    
+
     // Check if this is a bulk sync or single entry
     if (data.action === 'sync') {
       return syncAllData(sheet, data.referrals);
@@ -27,12 +27,12 @@ function doPost(e) {
     } else if (data.action === 'delete') {
       return deleteReferral(sheet, data.index);
     }
-    
+
     return ContentService.createTextOutput(JSON.stringify({
       status: 'error',
       message: 'Invalid action'
     })).setMimeType(ContentService.MimeType.JSON);
-    
+
   } catch (error) {
     return ContentService.createTextOutput(JSON.stringify({
       status: 'error',
@@ -41,23 +41,47 @@ function doPost(e) {
   }
 }
 
-function syncAllData(sheet, referrals) {
-  // Set up headers if not present
+function normalizeRewardStatus(value) {
+  const status = String(value || '').trim().toLowerCase();
+  if (status === 'yes' || status === 'paid') return 'Paid';
+  if (status === 'approved') return 'Approved';
+  return 'Pending';
+}
+
+function normalizeYesNo(value) {
+  return String(value || '').trim().toLowerCase() === 'yes' ? 'Yes' : 'No';
+}
+
+function ensureHeaders(sheet) {
+  const headers = ['No.', 'Referrer Name/Recommending Agent', 'Membership Number', 'Referred Member Name', 'Referred Membership No.', 'Admission Year', 'Referred Email', 'Reward Status', 'Date', 'Reward Amount', 'Reward Date', 'Admission Fee Paid', 'Admission Fee Date'];
+
   if (sheet.getLastRow() === 0) {
-    sheet.appendRow(['No.', 'Referrer Name/Recommending Agent', 'Membership Number', 'Referred Member Name', 'Referred Membership No.', 'Admission Year', 'Referred Email', 'Reward given (Yes/No)', 'Date']);
+    sheet.appendRow(headers);
+    return;
   }
-  
+
+  const currentHeaders = sheet.getRange(1, 1, 1, Math.max(sheet.getLastColumn(), headers.length)).getValues()[0];
+  headers.forEach((header, index) => {
+    if (currentHeaders[index] !== header) {
+      sheet.getRange(1, index + 1).setValue(header);
+    }
+  });
+}
+
+function syncAllData(sheet, referrals) {
+  ensureHeaders(sheet);
+
   // Get existing data
   const lastRow = sheet.getLastRow();
   const existingEmails = [];
-  
+
   if (lastRow > 1) {
-    const existingData = sheet.getRange(2, 1, lastRow - 1, 9).getValues();
+    const existingData = sheet.getRange(2, 1, lastRow - 1, 13).getValues();
     existingData.forEach(row => {
       existingEmails.push(row[6]); // Email is in column 7 (index 6)
     });
   }
-  
+
   // Add only new referrals that don't exist
   let addedCount = 0;
   referrals.forEach((referral, index) => {
@@ -72,13 +96,17 @@ function syncAllData(sheet, referrals) {
         referral.referredMembershipNo,
         referral.admissionYear,
         referral.referredEmail,
-        referral.rewardGiven,
-        new Date().toLocaleDateString()
+        normalizeRewardStatus(referral.rewardGiven),
+        referral.dateAdded || new Date().toLocaleDateString(),
+        referral.rewardAmount || '',
+        referral.rewardDate || '',
+        normalizeYesNo(referral.admissionFeePaid),
+        referral.admissionFeeDate || ''
       ]);
       addedCount++;
     }
   });
-  
+
   // Renumber all rows
   const totalRows = sheet.getLastRow();
   if (totalRows > 1) {
@@ -86,7 +114,7 @@ function syncAllData(sheet, referrals) {
       sheet.getRange(i, 1).setValue(i - 1);
     }
   }
-  
+
   return ContentService.createTextOutput(JSON.stringify({
     status: 'success',
     message: addedCount > 0 ? `${addedCount} new referral(s) added` : 'All data already synced',
@@ -95,10 +123,7 @@ function syncAllData(sheet, referrals) {
 }
 
 function addSingleReferral(sheet, referral) {
-  // Set up headers if not present
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(['No.', 'Referrer Name/Recommending Agent', 'Membership Number', 'Referred Member Name', 'Referred Membership No.', 'Admission Year', 'Referred Email', 'Reward given (Yes/No)', 'Date']);
-  }
+  ensureHeaders(sheet);
   const rowNumber = sheet.getLastRow() + 1;
   sheet.appendRow([
     rowNumber - 1,
@@ -108,10 +133,14 @@ function addSingleReferral(sheet, referral) {
     referral.referredMembershipNo,
     referral.admissionYear,
     referral.referredEmail,
-    referral.rewardGiven,
-    new Date().toLocaleDateString()
+    normalizeRewardStatus(referral.rewardGiven),
+    referral.dateAdded || new Date().toLocaleDateString(),
+    referral.rewardAmount || '',
+    referral.rewardDate || '',
+    normalizeYesNo(referral.admissionFeePaid),
+    referral.admissionFeeDate || ''
   ]);
-  
+
   return ContentService.createTextOutput(JSON.stringify({
     status: 'success',
     message: 'Referral added successfully'
@@ -119,24 +148,29 @@ function addSingleReferral(sheet, referral) {
 }
 
 function updateReferral(sheet, referral, index) {
+  ensureHeaders(sheet);
   const row = index + 2; // +2 because of header row and 0-based index
-  
+
   if (row > sheet.getLastRow()) {
     return ContentService.createTextOutput(JSON.stringify({
       status: 'error',
       message: 'Row not found'
     })).setMimeType(ContentService.MimeType.JSON);
   }
-  
+
   sheet.getRange(row, 2).setValue(referral.referrerName);
   sheet.getRange(row, 3).setValue(referral.membershipNumber);
   sheet.getRange(row, 4).setValue(referral.referredName);
   sheet.getRange(row, 5).setValue(referral.referredMembershipNo);
   sheet.getRange(row, 6).setValue(referral.admissionYear);
   sheet.getRange(row, 7).setValue(referral.referredEmail);
-  sheet.getRange(row, 8).setValue(referral.rewardGiven);
+  sheet.getRange(row, 8).setValue(normalizeRewardStatus(referral.rewardGiven));
   // Date column (9) remains unchanged during updates
-  
+  sheet.getRange(row, 10).setValue(referral.rewardAmount || '');
+  sheet.getRange(row, 11).setValue(referral.rewardDate || '');
+  sheet.getRange(row, 12).setValue(normalizeYesNo(referral.admissionFeePaid));
+  sheet.getRange(row, 13).setValue(referral.admissionFeeDate || '');
+
   return ContentService.createTextOutput(JSON.stringify({
     status: 'success',
     message: 'Referral updated successfully'
@@ -145,22 +179,22 @@ function updateReferral(sheet, referral, index) {
 
 function deleteReferral(sheet, index) {
   const row = index + 2; // +2 because of header row and 0-based index
-  
+
   if (row > sheet.getLastRow()) {
     return ContentService.createTextOutput(JSON.stringify({
       status: 'error',
       message: 'Row not found'
     })).setMimeType(ContentService.MimeType.JSON);
   }
-  
+
   sheet.deleteRow(row);
-  
+
   // Renumber all rows
   const lastRow = sheet.getLastRow();
   for (let i = 2; i <= lastRow; i++) {
     sheet.getRange(i, 1).setValue(i - 1);
   }
-  
+
   return ContentService.createTextOutput(JSON.stringify({
     status: 'success',
     message: 'Referral deleted successfully'
@@ -170,8 +204,9 @@ function deleteReferral(sheet, index) {
 function doGet(e) {
   try {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    ensureHeaders(sheet);
     const lastRow = sheet.getLastRow();
-    
+
     if (lastRow <= 1) {
       // No data, return empty array
       return ContentService.createTextOutput(JSON.stringify({
@@ -179,10 +214,10 @@ function doGet(e) {
         data: []
       })).setMimeType(ContentService.MimeType.JSON);
     }
-    
+
     // Get all data except header
-    const data = sheet.getRange(2, 1, lastRow - 1, 9).getValues();
-    
+    const data = sheet.getRange(2, 1, lastRow - 1, 13).getValues();
+
     // Convert to array of objects
     const referrals = data.map(row => ({
       referrerName: row[1],
@@ -191,15 +226,19 @@ function doGet(e) {
       referredMembershipNo: row[4],
       admissionYear: row[5],
       referredEmail: row[6],
-      rewardGiven: row[7],
-      dateAdded: row[8]
+      rewardGiven: normalizeRewardStatus(row[7]),
+      dateAdded: row[8],
+      rewardAmount: row[9],
+      rewardDate: row[10],
+      admissionFeePaid: normalizeYesNo(row[11]),
+      admissionFeeDate: row[12]
     }));
-    
+
     return ContentService.createTextOutput(JSON.stringify({
       status: 'success',
       data: referrals
     })).setMimeType(ContentService.MimeType.JSON);
-    
+
   } catch (error) {
     return ContentService.createTextOutput(JSON.stringify({
       status: 'error',

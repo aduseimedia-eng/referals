@@ -219,14 +219,46 @@
             font-weight: 600;
         }
 
-        .reward-yes {
+        .reward-yes,
+        .reward-paid {
             background: linear-gradient(135deg, #0056b3 0%, #007bff 100%);
             color: white;
         }
 
-        .reward-no {
+        .reward-no,
+        .reward-pending {
             background: #e8e8e8;
             color: #495057;
+        }
+
+        .reward-approved {
+            background: #fff3cd;
+            color: #7a5200;
+        }
+
+        .status-pending {
+            background: #fde2e2;
+            color: #8a1f1f;
+        }
+
+        .status-approved {
+            background: #fff1b8;
+            color: #6b4c00;
+        }
+
+        .status-paid {
+            background: #d7f5e5;
+            color: #0f5f38;
+        }
+
+        .fee-paid {
+            background: #e0f2fe;
+            color: #075985;
+        }
+
+        .fee-unpaid {
+            background: #f1f5f9;
+            color: #475569;
         }
 
         .action-btn {
@@ -279,17 +311,44 @@
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
             z-index: 1000;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
+            overflow-y: auto;
+            padding: 32px 16px;
         }
 
         .modal-content {
             background: white;
             padding: 30px;
             border-radius: 15px;
-            max-width: 500px;
+            max-width: 780px;
             width: 90%;
+            max-height: calc(100vh - 64px);
+            overflow-y: auto;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-content form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .modal-content .form-grid {
+            margin-bottom: 0;
+        }
+
+        .modal-content .form-group {
+            margin-top: 0 !important;
+        }
+
+        .modal-content .button-group {
+            position: sticky;
+            bottom: -30px;
+            margin: 0 -30px -30px;
+            padding: 16px 30px;
+            background: white;
+            border-top: 1px solid #e9ecef;
         }
 
         .modal-header {
@@ -1031,14 +1090,46 @@
             font-size: 0.72rem;
         }
 
-        .reward-yes {
+        .reward-yes,
+        .reward-paid {
             background: #d9edf7;
             color: #075777;
         }
 
-        .reward-no {
+        .reward-no,
+        .reward-pending {
             background: #edf1f4;
             color: #617281;
+        }
+
+        .reward-approved {
+            background: #fff3cd;
+            color: #7a5200;
+        }
+
+        .status-pending {
+            background: #fde2e2;
+            color: #8a1f1f;
+        }
+
+        .status-approved {
+            background: #fff1b8;
+            color: #6b4c00;
+        }
+
+        .status-paid {
+            background: #d7f5e5;
+            color: #0f5f38;
+        }
+
+        .fee-paid {
+            background: #e0f2fe;
+            color: #075985;
+        }
+
+        .fee-unpaid {
+            background: #f1f5f9;
+            color: #475569;
         }
 
         .action-btn {
@@ -1543,13 +1634,25 @@
                     <div class="stat-card">
                         <div class="stat-copy">
                             <h3 id="rewardsGiven">0</h3>
-                            <p>Rewards Given</p>
+                            <p>Rewards Paid</p>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-copy">
                             <h3 id="pendingRewards">0</h3>
-                            <p>Pending Rewards</p>
+                            <p>Rewards Pending</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-copy">
+                            <h3 id="admissionFeesPaid">0</h3>
+                            <p>Admission Fees Paid</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-copy">
+                            <h3 id="rewardsReady">0</h3>
+                            <p>Ready for Reward</p>
                         </div>
                     </div>
                 </div>
@@ -1582,19 +1685,21 @@
                             <tr>
                                 <th>#</th>
                                 <th>Referrer Name/Recommending Agent</th>
-                                <th>Membership Number</th>
                                 <th>Referred Member Name</th>
-                                <th>Referred Membership No.</th>
+                                <th>Admission Fee Paid</th>
+                                <th>Reward Status</th>
+                                <th>Membership Number</th>
                                 <th>Admission Year</th>
                                 <th>Referred Email</th>
-                                <th>Reward given (Yes/No)</th>
+                                <th>Admission Fee Date</th>
+                                <th>Reward Date</th>
                                 <th>Date</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="referralTableBody">
                             <tr>
-                                <td colspan="10" class="empty-state">
+                                <td colspan="12" class="empty-state">
                                     <p>No referrals added yet. Start by adding your first referral above!</p>
                                 </td>
                             </tr>
@@ -1638,10 +1743,7 @@
                             <label for="referredName">Referred Member Name</label>
                             <input type="text" id="referredName" placeholder="Enter referred member name">
                         </div>
-                        <div class="form-group">
-                            <label for="referredMembershipNo">Referred Membership No.</label>
-                            <input type="text" id="referredMembershipNo" placeholder="Enter referred membership no.">
-                        </div>
+                        <input type="hidden" id="referredMembershipNo">
                         <div class="form-group">
                             <label for="admissionYear">Admission Year</label>
                             <input type="number" id="admissionYear" placeholder="e.g., 2024" min="1900" max="2099">
@@ -1651,12 +1753,28 @@
                             <input type="email" id="referredEmail" placeholder="member@example.com" required>
                         </div>
                         <div class="form-group">
-                            <label for="rewardGiven">Reward given (Yes/No)</label>
-                            <select id="rewardGiven">
-                                <option value="">Select...</option>
-                                <option value="Yes">Yes</option>
+                            <label for="admissionFeePaid">Admission Fee Paid</label>
+                            <select id="admissionFeePaid">
                                 <option value="No">No</option>
+                                <option value="Yes">Yes</option>
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="admissionFeeDate">Admission Fee Date</label>
+                            <input type="date" id="admissionFeeDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="rewardGiven">Reward Status</label>
+                            <select id="rewardGiven">
+                                <option value="Pending">Pending</option>
+                                <option value="Approved">Approved</option>
+                                <option value="Paid">Paid</option>
+                            </select>
+                        </div>
+                        <input type="hidden" id="rewardAmount">
+                        <div class="form-group">
+                            <label for="rewardDate">Reward Date</label>
+                            <input type="date" id="rewardDate">
                         </div>
                     </div>
                     <div class="button-group">
@@ -1682,36 +1800,52 @@
                 <h3>Edit Referral</h3>
             </div>
             <form id="editForm">
-                <div class="form-group">
-                    <label for="editReferrerName">Referrer Name/Recommending Agent</label>
-                    <input type="text" id="editReferrerName">
-                </div>
-                <div class="form-group" style="margin-top: 15px;">
-                    <label for="editMembershipNumber">Membership Number</label>
-                    <input type="text" id="editMembershipNumber">
-                </div>
-                <div class="form-group" style="margin-top: 15px;">
-                    <label for="editReferredName">Referred Member Name</label>
-                    <input type="text" id="editReferredName">
-                </div>
-                <div class="form-group" style="margin-top: 15px;">
-                    <label for="editReferredMembershipNo">Referred Membership No.</label>
-                    <input type="text" id="editReferredMembershipNo">
-                </div>
-                <div class="form-group" style="margin-top: 15px;">
-                    <label for="editAdmissionYear">Admission Year</label>
-                    <input type="number" id="editAdmissionYear" min="1900" max="2099">
-                </div>
-                <div class="form-group" style="margin-top: 15px;">
-                    <label for="editReferredEmail">Referred Email</label>
-                    <input type="email" id="editReferredEmail">
-                </div>
-                <div class="form-group" style="margin-top: 15px;">
-                    <label for="editRewardGiven">Reward given (Yes/No)</label>
-                    <select id="editRewardGiven">
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                    </select>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="editReferrerName">Referrer Name/Recommending Agent</label>
+                        <input type="text" id="editReferrerName">
+                    </div>
+                    <div class="form-group">
+                        <label for="editMembershipNumber">Membership Number</label>
+                        <input type="text" id="editMembershipNumber">
+                    </div>
+                    <div class="form-group">
+                        <label for="editReferredName">Referred Member Name</label>
+                        <input type="text" id="editReferredName">
+                    </div>
+                    <input type="hidden" id="editReferredMembershipNo">
+                    <div class="form-group">
+                        <label for="editAdmissionYear">Admission Year</label>
+                        <input type="number" id="editAdmissionYear" min="1900" max="2099">
+                    </div>
+                    <div class="form-group">
+                        <label for="editReferredEmail">Referred Email</label>
+                        <input type="email" id="editReferredEmail">
+                    </div>
+                    <div class="form-group">
+                        <label for="editAdmissionFeePaid">Admission Fee Paid</label>
+                        <select id="editAdmissionFeePaid">
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAdmissionFeeDate">Admission Fee Date</label>
+                        <input type="date" id="editAdmissionFeeDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="editRewardGiven">Reward Status</label>
+                        <select id="editRewardGiven">
+                            <option value="Pending">Pending</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Paid">Paid</option>
+                        </select>
+                    </div>
+                    <input type="hidden" id="editRewardAmount">
+                    <div class="form-group">
+                        <label for="editRewardDate">Reward Date</label>
+                        <input type="date" id="editRewardDate">
+                    </div>
                 </div>
                 <div class="button-group" style="margin-top: 20px;">
                     <button type="submit" class="btn-primary">💾 Save Changes</button>
@@ -1742,6 +1876,55 @@
         const REFERRALS_PER_PAGE = 10;
         let currentReferralPage = 1;
 
+        function normalizeRewardStatus(value) {
+            const status = String(value || '').trim().toLowerCase();
+            if (status === 'yes' || status === 'paid') return 'Paid';
+            if (status === 'approved') return 'Approved';
+            return 'Pending';
+        }
+
+        function getRewardClass(status) {
+            return normalizeRewardStatus(status).toLowerCase().replace(/\s+/g, '-');
+        }
+
+        function isRewardPaid(referral) {
+            return normalizeRewardStatus(referral.rewardGiven) === 'Paid';
+        }
+
+        function normalizeYesNo(value) {
+            return String(value || '').trim().toLowerCase() === 'yes' ? 'Yes' : 'No';
+        }
+
+        function isAdmissionFeePaid(referral) {
+            return normalizeYesNo(referral.admissionFeePaid) === 'Yes';
+        }
+
+        function validateRewardEligibility(rewardStatus, admissionFeePaid) {
+            if (normalizeRewardStatus(rewardStatus) !== 'Pending' && normalizeYesNo(admissionFeePaid) !== 'Yes') {
+                showToast('Mark the admission fee as paid before approving or paying a reward.');
+                return false;
+            }
+            return true;
+        }
+
+        function normalizeReferral(referral) {
+            const rewardStatus = normalizeRewardStatus(referral.rewardGiven);
+            return {
+                ...referral,
+                referrerName: String(referral.referrerName || '').trim(),
+                membershipNumber: String(referral.membershipNumber || '').trim(),
+                referredName: String(referral.referredName || '').trim(),
+                referredMembershipNo: String(referral.referredMembershipNo || '').trim(),
+                admissionYear: String(referral.admissionYear || '').trim(),
+                referredEmail: String(referral.referredEmail || '').trim(),
+                admissionFeePaid: normalizeYesNo(referral.admissionFeePaid),
+                admissionFeeDate: String(referral.admissionFeeDate || '').trim(),
+                rewardGiven: rewardStatus,
+                rewardAmount: String(referral.rewardAmount || '').trim(),
+                rewardDate: String(referral.rewardDate || '').trim()
+            };
+        }
+
         // Carousel Functions
         function getTopReferrers() {
             console.log('Total referrals in system:', referrals.length);
@@ -1756,7 +1939,7 @@
                         referrerMap[normalizedName] = { name: normalizedName, total: 0, rewards: 0 };
                     }
                     referrerMap[normalizedName].total++;
-                    if (r.rewardGiven === 'Yes') referrerMap[normalizedName].rewards++;
+                    if (isRewardPaid(r)) referrerMap[normalizedName].rewards++;
                 }
             });
 
@@ -1787,7 +1970,7 @@
                     <div class="carousel-rank">${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}</div>
                     <div class="carousel-name">${referrer.name}</div>
                     <div class="carousel-stat">📊 Total Referrals: <strong>${referrer.total}</strong></div>
-                    <div class="carousel-stat">🎁 Rewards Given: <strong>${referrer.rewards}</strong></div>
+                    <div class="carousel-stat">🎁 Rewards Paid: <strong>${referrer.rewards}</strong></div>
                 </div>
             `).join('');
 
@@ -1850,7 +2033,7 @@
         async function loadFromGoogleSheets() {
             if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === 'YOUR_SCRIPT_URL_HERE') {
                 console.warn('Google Sheets URL not configured, using localStorage');
-                referrals = JSON.parse(localStorage.getItem('iodReferrals')) || [];
+                referrals = (JSON.parse(localStorage.getItem('iodReferrals')) || []).map(normalizeReferral);
                 isLoading = false;
                 updateStats();
                 renderTable();
@@ -1875,25 +2058,19 @@
                             }
                             // If it's already a locale date string, keep it as is
                         }
-                        return {
+                        return normalizeReferral({
                             ...r,
-                            referrerName: String(r.referrerName || '').trim(),
-                            membershipNumber: String(r.membershipNumber || '').trim(),
-                            referredName: String(r.referredName || '').trim(),
-                            referredMembershipNo: String(r.referredMembershipNo || '').trim(),
-                            admissionYear: String(r.admissionYear || '').trim(),
-                            referredEmail: String(r.referredEmail || '').trim(),
                             dateAdded: formattedDate
-                        };
+                        });
                     });
                     console.log('Processed referrals:', referrals);
                     localStorage.setItem('iodReferrals', JSON.stringify(referrals)); // Backup to localStorage
                 } else {
-                    referrals = JSON.parse(localStorage.getItem('iodReferrals')) || [];
+                    referrals = (JSON.parse(localStorage.getItem('iodReferrals')) || []).map(normalizeReferral);
                 }
             } catch (error) {
                 console.error('Error loading from Google Sheets:', error);
-                referrals = JSON.parse(localStorage.getItem('iodReferrals')) || [];
+                referrals = (JSON.parse(localStorage.getItem('iodReferrals')) || []).map(normalizeReferral);
                 showToast('⚠️ Using offline data');
             } finally {
                 isLoading = false;
@@ -2001,9 +2178,13 @@
 
         function updateStats() {
             document.getElementById('totalReferrals').textContent = referrals.length;
-            const rewardsGiven = referrals.filter(r => r.rewardGiven === 'Yes').length;
+            const rewardsGiven = referrals.filter(isRewardPaid).length;
+            const admissionFeesPaid = referrals.filter(isAdmissionFeePaid).length;
+            const rewardsReady = referrals.filter(r => isAdmissionFeePaid(r) && !isRewardPaid(r)).length;
             document.getElementById('rewardsGiven').textContent = rewardsGiven;
             document.getElementById('pendingRewards').textContent = referrals.length - rewardsGiven;
+            document.getElementById('admissionFeesPaid').textContent = admissionFeesPaid;
+            document.getElementById('rewardsReady').textContent = rewardsReady;
         }
 
         function populateYearFilter() {
@@ -2043,9 +2224,12 @@
                 const matchesSearch = r.referrerName.toLowerCase().includes(searchValue.toLowerCase()) ||
                     r.membershipNumber.toLowerCase().includes(searchValue.toLowerCase()) ||
                     r.referredName.toLowerCase().includes(searchValue.toLowerCase()) ||
-                    r.referredMembershipNo.toLowerCase().includes(searchValue.toLowerCase()) ||
                     String(r.admissionYear).includes(searchValue) ||
-                    r.referredEmail.toLowerCase().includes(searchValue.toLowerCase());
+                    r.referredEmail.toLowerCase().includes(searchValue.toLowerCase()) ||
+                    normalizeYesNo(r.admissionFeePaid).toLowerCase().includes(searchValue.toLowerCase()) ||
+                    String(r.admissionFeeDate || '').includes(searchValue) ||
+                    normalizeRewardStatus(r.rewardGiven).toLowerCase().includes(searchValue.toLowerCase()) ||
+                    String(r.rewardDate || '').includes(searchValue);
                 
                 const matchesYear = !yearValue || String(r.admissionYear) === yearValue;
                 
@@ -2059,7 +2243,7 @@
             if (filtered.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="10" class="empty-state">
+                        <td colspan="12" class="empty-state">
                             <p>${searchValue || yearValue ? 'No referrals match your filters.' : 'No referrals added yet.'}</p>
                         </td>
                     </tr>
@@ -2078,12 +2262,14 @@
                 <tr>
                     <td>${startIndex + i + 1}</td>
                     <td>${r.referrerName}</td>
-                    <td>${r.membershipNumber || '-'}</td>
                     <td>${r.referredName}</td>
-                    <td>${r.referredMembershipNo || '-'}</td>
+                    <td><span class="reward-badge ${isAdmissionFeePaid(r) ? 'fee-paid' : 'fee-unpaid'}">${isAdmissionFeePaid(r) ? 'Paid' : 'Not paid'}</span></td>
+                    <td><span class="reward-badge status-${getRewardClass(r.rewardGiven)}">${normalizeRewardStatus(r.rewardGiven)}</span></td>
+                    <td>${r.membershipNumber || '-'}</td>
                     <td>${r.admissionYear || '-'}</td>
                     <td>${r.referredEmail}</td>
-                    <td><span class="reward-badge reward-${r.rewardGiven.toLowerCase()}">${r.rewardGiven}</span></td>
+                    <td>${r.admissionFeeDate || '-'}</td>
+                    <td>${r.rewardDate || '-'}</td>
                     <td>${r.dateAdded}</td>
                     <td>
                         <button class="action-btn btn-edit" onclick="editReferral(${referrals.indexOf(r)})">✏️ Edit</button>
@@ -2158,9 +2344,15 @@
                 referredMembershipNo: document.getElementById('referredMembershipNo').value.trim(),
                 admissionYear: document.getElementById('admissionYear').value,
                 referredEmail: document.getElementById('referredEmail').value.trim(),
-                rewardGiven: document.getElementById('rewardGiven').value,
+                admissionFeePaid: normalizeYesNo(document.getElementById('admissionFeePaid').value),
+                admissionFeeDate: document.getElementById('admissionFeeDate').value,
+                rewardGiven: normalizeRewardStatus(document.getElementById('rewardGiven').value),
+                rewardAmount: document.getElementById('rewardAmount').value.trim(),
+                rewardDate: document.getElementById('rewardDate').value,
                 dateAdded: new Date().toLocaleDateString()
             };
+
+            if (!validateRewardEligibility(referral.rewardGiven, referral.admissionFeePaid)) return;
 
             // Use bulk sync for single adds because older Apps Script deployments may
             // reject the dedicated "add" action even though sync works correctly.
@@ -2192,16 +2384,22 @@
                 referredMembershipNo: document.getElementById('editReferredMembershipNo').value,
                 admissionYear: document.getElementById('editAdmissionYear').value,
                 referredEmail: document.getElementById('editReferredEmail').value,
-                rewardGiven: document.getElementById('editRewardGiven').value,
+                admissionFeePaid: normalizeYesNo(document.getElementById('editAdmissionFeePaid').value),
+                admissionFeeDate: document.getElementById('editAdmissionFeeDate').value,
+                rewardGiven: normalizeRewardStatus(document.getElementById('editRewardGiven').value),
+                rewardAmount: document.getElementById('editRewardAmount').value.trim(),
+                rewardDate: document.getElementById('editRewardDate').value,
                 dateAdded: referrals[editingIndex].dateAdded
             };
+
+            if (!validateRewardEligibility(updatedReferral.rewardGiven, updatedReferral.admissionFeePaid)) return;
             
             // Update in Google Sheets
             const synced = await syncToGoogleSheets('update', { referral: updatedReferral, index: editingIndex });
             
             if (synced) {
-                // Reload from Google Sheets
-                await loadFromGoogleSheets();
+                referrals[editingIndex] = normalizeReferral(updatedReferral);
+                saveToStorage();
                 showToast('Referral updated successfully!');
                 closeEditModal();
             } else if (shouldUseOfflineFallback()) {
@@ -2224,7 +2422,11 @@
             document.getElementById('editReferredMembershipNo').value = r.referredMembershipNo || '';
             document.getElementById('editAdmissionYear').value = r.admissionYear || '';
             document.getElementById('editReferredEmail').value = r.referredEmail;
-            document.getElementById('editRewardGiven').value = r.rewardGiven;
+            document.getElementById('editAdmissionFeePaid').value = normalizeYesNo(r.admissionFeePaid);
+            document.getElementById('editAdmissionFeeDate').value = r.admissionFeeDate || '';
+            document.getElementById('editRewardGiven').value = normalizeRewardStatus(r.rewardGiven);
+            document.getElementById('editRewardAmount').value = r.rewardAmount || '';
+            document.getElementById('editRewardDate').value = r.rewardDate || '';
             document.getElementById('editModal').style.display = 'flex';
         }
 
@@ -2276,16 +2478,18 @@
                 return;
             }
 
-            const headers = ['No.', 'Referrer Name/Recommending Agent', 'Membership Number', 'Referred Member Name', 'Referred Membership No.', 'Admission Year', 'Referred Email', 'Reward given (Yes/No)', 'Date'];
+            const headers = ['No.', 'Referrer Name/Recommending Agent', 'Membership Number', 'Referred Member Name', 'Admission Year', 'Referred Email', 'Admission Fee Paid', 'Admission Fee Date', 'Reward Status', 'Reward Date', 'Date'];
             const rows = referrals.map((r, i) => [
                 i + 1,
                 r.referrerName,
                 r.membershipNumber || '',
                 r.referredName,
-                r.referredMembershipNo || '',
                 r.admissionYear || '',
                 r.referredEmail,
-                r.rewardGiven,
+                normalizeYesNo(r.admissionFeePaid),
+                r.admissionFeeDate || '',
+                normalizeRewardStatus(r.rewardGiven),
+                r.rewardDate || '',
                 r.dateAdded
             ]);
 
@@ -2309,16 +2513,18 @@
                 return;
             }
 
-            const headers = ['No.', 'Referrer Name/Recommending Agent', 'Membership Number', 'Referred Member Name', 'Referred Membership No.', 'Admission Year', 'Referred Email', 'Reward given (Yes/No)', 'Date'];
+            const headers = ['No.', 'Referrer Name/Recommending Agent', 'Membership Number', 'Referred Member Name', 'Admission Year', 'Referred Email', 'Admission Fee Paid', 'Admission Fee Date', 'Reward Status', 'Reward Date', 'Date'];
             const rows = referrals.map((r, i) => [
                 i + 1,
                 r.referrerName,
                 r.membershipNumber || '',
                 r.referredName,
-                r.referredMembershipNo || '',
                 r.admissionYear || '',
                 r.referredEmail,
-                r.rewardGiven,
+                normalizeYesNo(r.admissionFeePaid),
+                r.admissionFeeDate || '',
+                normalizeRewardStatus(r.rewardGiven),
+                r.rewardDate || '',
                 r.dateAdded
             ]);
 
@@ -2412,7 +2618,7 @@
                     <div class="referrer-lottie" data-referrer-lottie="${index}" aria-hidden="true"></div>
                     <div class="carousel-name">${referrer.name}</div>
                     <div class="carousel-stat">Total Referrals: <strong>${referrer.total}</strong></div>
-                    <div class="carousel-stat">Rewards Given: <strong>${referrer.rewards}</strong></div>
+                    <div class="carousel-stat">Rewards Paid: <strong>${referrer.rewards}</strong></div>
                 </div>
             `).join('');
             initTopReferrerLotties();
