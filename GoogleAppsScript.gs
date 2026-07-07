@@ -26,6 +26,8 @@ function doPost(e) {
       return updateReferral(sheet, data.referral, data.index);
     } else if (data.action === 'delete') {
       return deleteReferral(sheet, data.index);
+    } else if (data.action === 'emailReport') {
+      return emailReferralReport(data.email, data.referrals);
     }
 
     return ContentService.createTextOutput(JSON.stringify({
@@ -63,6 +65,68 @@ function setupReferralSheetColumns() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   ensureHeaders(sheet);
   return `Referral Tracker columns are ready on "${sheet.getName()}".`;
+}
+
+function reportHeaders() {
+  return ['No.', 'Referrer Name/Recommending Agent', 'Membership Number', 'Referred Member Name', 'Admission Year', 'Referred Email', 'Admission Fee Paid', 'Admission Fee Date', 'Reward Status', 'Reward Date', 'Date'];
+}
+
+function csvCell(value) {
+  return `"${String(value == null ? '' : value).replace(/"/g, '""')}"`;
+}
+
+function buildReferralReportCsv(referrals) {
+  const rows = referrals.map((referral, index) => [
+    index + 1,
+    referral.referrerName,
+    referral.membershipNumber || '',
+    referral.referredName,
+    referral.admissionYear || '',
+    referral.referredEmail,
+    normalizeYesNo(referral.admissionFeePaid),
+    referral.admissionFeeDate || '',
+    normalizeRewardStatus(referral.rewardGiven),
+    referral.rewardDate || '',
+    referral.dateAdded || ''
+  ]);
+
+  return [reportHeaders()].concat(rows)
+    .map(row => row.map(csvCell).join(','))
+    .join('\n');
+}
+
+function emailReferralReport(email, referrals) {
+  if (!email || !String(email).match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+    return ContentService.createTextOutput(JSON.stringify({
+      status: 'error',
+      message: 'A valid email address is required'
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  if (!referrals || referrals.length === 0) {
+    return ContentService.createTextOutput(JSON.stringify({
+      status: 'error',
+      message: 'No referrals available to email'
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  const csv = buildReferralReportCsv(referrals);
+  const fileName = `IoD_Referrals_${today}.csv`;
+
+  MailApp.sendEmail({
+    to: String(email).trim(),
+    subject: `IoD Referral Report - ${today}`,
+    body: 'Please find attached the latest IoD referral CSV report.',
+    attachments: [
+      Utilities.newBlob(csv, 'text/csv', fileName)
+    ]
+  });
+
+  return ContentService.createTextOutput(JSON.stringify({
+    status: 'success',
+    message: 'CSV report emailed successfully'
+  })).setMimeType(ContentService.MimeType.JSON);
 }
 
 function ensureHeaders(sheet) {

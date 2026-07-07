@@ -1721,6 +1721,9 @@
                     <button class="btn-success" onclick="exportToCSV()">
                         📥 Export to CSV
                     </button>
+                    <button class="btn-success" onclick="emailCSVReportToBoss()">
+                        Email CSV Report
+                    </button>
                     <button class="btn-primary" onclick="syncAllToGoogleSheets()">
                         🔄 Sync All to Google Sheets
                     </button>
@@ -1732,7 +1735,7 @@
                 <form id="referralForm">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="referrerName">Referrer Name/Recommending Agent</label>
+                            <label for="referrerName">Recommending Agent</label>
                             <input type="text" id="referrerName" placeholder="Enter referrer name" required>
                         </div>
                         <div class="form-group">
@@ -2472,12 +2475,7 @@
             filterTable(true);
         });
 
-        function exportToCSV() {
-            if (referrals.length === 0) {
-                alert('No data to export!');
-                return;
-            }
-
+        function buildReferralReportRows() {
             const headers = ['No.', 'Referrer Name/Recommending Agent', 'Membership Number', 'Referred Member Name', 'Admission Year', 'Referred Email', 'Admission Fee Paid', 'Admission Fee Date', 'Reward Status', 'Reward Date', 'Date'];
             const rows = referrals.map((r, i) => [
                 i + 1,
@@ -2493,10 +2491,26 @@
                 r.dateAdded
             ]);
 
+            return { headers, rows };
+        }
+
+        function buildReferralReportCSV() {
+            const { headers, rows } = buildReferralReportRows();
             let csv = headers.join(',') + '\n';
             rows.forEach(row => {
                 csv += row.map(cell => `"${cell}"`).join(',') + '\n';
             });
+
+            return csv;
+        }
+
+        function exportToCSV() {
+            if (referrals.length === 0) {
+                alert('No data to export!');
+                return;
+            }
+
+            const csv = buildReferralReportCSV();
 
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
@@ -2507,26 +2521,41 @@
             showToast('CSV exported successfully!');
         }
 
+        async function emailCSVReportToBoss() {
+            if (referrals.length === 0) {
+                alert('No data to send!');
+                return;
+            }
+
+            const savedEmail = localStorage.getItem('iodReferralBossEmail') || '';
+            const email = prompt("Enter your boss's email address:", savedEmail);
+            if (!email) return;
+
+            const trimmedEmail = email.trim();
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+                showToast('Enter a valid email address.');
+                return;
+            }
+
+            showToast('Sending CSV report...');
+            const sent = await syncToGoogleSheets('emailReport', {
+                email: trimmedEmail,
+                referrals
+            });
+
+            if (sent) {
+                localStorage.setItem('iodReferralBossEmail', trimmedEmail);
+                showToast('CSV report emailed successfully!');
+            }
+        }
+
         function exportToGoogleSheets() {
             if (referrals.length === 0) {
                 alert('No data to export!');
                 return;
             }
 
-            const headers = ['No.', 'Referrer Name/Recommending Agent', 'Membership Number', 'Referred Member Name', 'Admission Year', 'Referred Email', 'Admission Fee Paid', 'Admission Fee Date', 'Reward Status', 'Reward Date', 'Date'];
-            const rows = referrals.map((r, i) => [
-                i + 1,
-                r.referrerName,
-                r.membershipNumber || '',
-                r.referredName,
-                r.admissionYear || '',
-                r.referredEmail,
-                normalizeYesNo(r.admissionFeePaid),
-                r.admissionFeeDate || '',
-                normalizeRewardStatus(r.rewardGiven),
-                r.rewardDate || '',
-                r.dateAdded
-            ]);
+            const { headers, rows } = buildReferralReportRows();
 
             let tsv = headers.join('\t') + '\n';
             rows.forEach(row => {
