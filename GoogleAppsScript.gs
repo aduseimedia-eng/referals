@@ -95,6 +95,60 @@ function buildReferralReportCsv(referrals) {
     .join('\n');
 }
 
+function sheetHeaders() {
+  return reportHeaders();
+}
+
+function getHeaderIndex(headers, names) {
+  for (let i = 0; i < names.length; i++) {
+    const index = headers.indexOf(names[i]);
+    if (index !== -1) return index;
+  }
+  return -1;
+}
+
+function getRowValue(row, headers, names, fallbackIndex) {
+  const index = getHeaderIndex(headers, names);
+  if (index !== -1) return row[index];
+  return fallbackIndex >= 0 ? row[fallbackIndex] : '';
+}
+
+function sheetRowToReferral(row, headers) {
+  const fallbackAdmissionYear = row[5] && !String(row[5]).includes('@') ? row[5] : '';
+  const fallbackEmail = row[6] && String(row[6]).includes('@') ? row[6] : row[5];
+
+  return {
+    referrerName: getRowValue(row, headers, ['Referrer Name/Recommending Agent'], 1),
+    membershipNumber: getRowValue(row, headers, ['Membership Number'], 2),
+    referredName: getRowValue(row, headers, ['Referred Member Name'], 3),
+    referredMembershipNo: getRowValue(row, headers, ['Referred Membership No.'], -1),
+    admissionYear: getRowValue(row, headers, ['Admission Year'], -1) || fallbackAdmissionYear,
+    referredEmail: getRowValue(row, headers, ['Referred Email'], -1) || fallbackEmail,
+    admissionFeePaid: normalizeYesNo(getRowValue(row, headers, ['Admission Fee Paid'], -1)),
+    admissionFeeDate: getRowValue(row, headers, ['Admission Fee Date'], -1),
+    rewardGiven: normalizeRewardStatus(getRowValue(row, headers, ['Reward Status', 'Reward given (Yes/No)'], 7)),
+    rewardDate: getRowValue(row, headers, ['Reward Date'], -1),
+    dateAdded: getRowValue(row, headers, ['Date'], 8),
+    rewardAmount: getRowValue(row, headers, ['Reward Amount'], -1)
+  };
+}
+
+function referralToSheetRow(referral, index) {
+  return [
+    index + 1,
+    referral.referrerName,
+    referral.membershipNumber || '',
+    referral.referredName,
+    referral.admissionYear || '',
+    referral.referredEmail,
+    normalizeYesNo(referral.admissionFeePaid),
+    referral.admissionFeeDate || '',
+    normalizeRewardStatus(referral.rewardGiven),
+    referral.rewardDate || '',
+    referral.dateAdded || new Date().toLocaleDateString()
+  ];
+}
+
 function emailReferralReport(email, referrals) {
   if (!email || !String(email).match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
     return ContentService.createTextOutput(JSON.stringify({
@@ -130,19 +184,32 @@ function emailReferralReport(email, referrals) {
 }
 
 function ensureHeaders(sheet) {
-  const headers = ['No.', 'Referrer Name/Recommending Agent', 'Membership Number', 'Referred Member Name', 'Referred Membership No.', 'Admission Year', 'Referred Email', 'Reward Status', 'Date', 'Reward Amount', 'Reward Date', 'Admission Fee Paid', 'Admission Fee Date'];
+  const headers = sheetHeaders();
 
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(headers);
     return;
   }
 
-  const currentHeaders = sheet.getRange(1, 1, 1, Math.max(sheet.getLastColumn(), headers.length)).getValues()[0];
-  headers.forEach((header, index) => {
-    if (currentHeaders[index] !== header) {
-      sheet.getRange(1, index + 1).setValue(header);
+  const lastRow = sheet.getLastRow();
+  const currentWidth = Math.max(sheet.getLastColumn(), headers.length);
+  const currentHeaders = sheet.getRange(1, 1, 1, currentWidth).getValues()[0];
+  const needsMigration = headers.some((header, index) => currentHeaders[index] !== header);
+
+  if (needsMigration) {
+    const existingRows = lastRow > 1
+      ? sheet.getRange(2, 1, lastRow - 1, currentWidth).getValues()
+      : [];
+    const referrals = existingRows.map(row => sheetRowToReferral(row, currentHeaders));
+    sheet.getRange(1, 1, lastRow, currentWidth).clearContent();
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    if (referrals.length > 0) {
+      sheet.getRange(2, 1, referrals.length, headers.length)
+        .setValues(referrals.map((referral, index) => referralToSheetRow(referral, index)));
     }
-  });
+  } else {
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+  }
 
   sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
   sheet.setFrozenRows(1);
@@ -158,9 +225,9 @@ function syncAllData(sheet, referrals) {
   const existingEmails = [];
 
   if (lastRow > 1) {
-    const existingData = sheet.getRange(2, 1, lastRow - 1, 13).getValues();
+    const existingData = sheet.getRange(2, 1, lastRow - 1, sheetHeaders().length).getValues();
     existingData.forEach(row => {
-      existingEmails.push(row[6]); // Email is in column 7 (index 6)
+      existingEmails.push(row[5]); // Email is in column 6 (index 5)
     });
   }
 
@@ -170,21 +237,7 @@ function syncAllData(sheet, referrals) {
     // Check if this email already exists in the sheet
     if (!existingEmails.includes(referral.referredEmail)) {
       const rowNumber = sheet.getLastRow() + 1;
-      sheet.appendRow([
-        rowNumber - 1,
-        referral.referrerName,
-        referral.membershipNumber,
-        referral.referredName,
-        referral.referredMembershipNo,
-        referral.admissionYear,
-        referral.referredEmail,
-        normalizeRewardStatus(referral.rewardGiven),
-        referral.dateAdded || new Date().toLocaleDateString(),
-        referral.rewardAmount || '',
-        referral.rewardDate || '',
-        normalizeYesNo(referral.admissionFeePaid),
-        referral.admissionFeeDate || ''
-      ]);
+      sheet.appendRow(referralToSheetRow(referral, rowNumber - 2));
       addedCount++;
     }
   });
@@ -207,21 +260,7 @@ function syncAllData(sheet, referrals) {
 function addSingleReferral(sheet, referral) {
   ensureHeaders(sheet);
   const rowNumber = sheet.getLastRow() + 1;
-  sheet.appendRow([
-    rowNumber - 1,
-    referral.referrerName,
-    referral.membershipNumber,
-    referral.referredName,
-    referral.referredMembershipNo,
-    referral.admissionYear,
-    referral.referredEmail,
-    normalizeRewardStatus(referral.rewardGiven),
-    referral.dateAdded || new Date().toLocaleDateString(),
-    referral.rewardAmount || '',
-    referral.rewardDate || '',
-    normalizeYesNo(referral.admissionFeePaid),
-    referral.admissionFeeDate || ''
-  ]);
+  sheet.appendRow(referralToSheetRow(referral, rowNumber - 2));
 
   return ContentService.createTextOutput(JSON.stringify({
     status: 'success',
@@ -243,15 +282,13 @@ function updateReferral(sheet, referral, index) {
   sheet.getRange(row, 2).setValue(referral.referrerName);
   sheet.getRange(row, 3).setValue(referral.membershipNumber);
   sheet.getRange(row, 4).setValue(referral.referredName);
-  sheet.getRange(row, 5).setValue(referral.referredMembershipNo);
-  sheet.getRange(row, 6).setValue(referral.admissionYear);
-  sheet.getRange(row, 7).setValue(referral.referredEmail);
-  sheet.getRange(row, 8).setValue(normalizeRewardStatus(referral.rewardGiven));
-  // Date column (9) remains unchanged during updates
-  sheet.getRange(row, 10).setValue(referral.rewardAmount || '');
-  sheet.getRange(row, 11).setValue(referral.rewardDate || '');
-  sheet.getRange(row, 12).setValue(normalizeYesNo(referral.admissionFeePaid));
-  sheet.getRange(row, 13).setValue(referral.admissionFeeDate || '');
+  sheet.getRange(row, 5).setValue(referral.admissionYear);
+  sheet.getRange(row, 6).setValue(referral.referredEmail);
+  sheet.getRange(row, 7).setValue(normalizeYesNo(referral.admissionFeePaid));
+  sheet.getRange(row, 8).setValue(referral.admissionFeeDate || '');
+  sheet.getRange(row, 9).setValue(normalizeRewardStatus(referral.rewardGiven));
+  sheet.getRange(row, 10).setValue(referral.rewardDate || '');
+  // Date column (11) remains unchanged during updates
 
   return ContentService.createTextOutput(JSON.stringify({
     status: 'success',
@@ -298,23 +335,10 @@ function doGet(e) {
     }
 
     // Get all data except header
-    const data = sheet.getRange(2, 1, lastRow - 1, 13).getValues();
+    const data = sheet.getRange(2, 1, lastRow - 1, sheetHeaders().length).getValues();
 
     // Convert to array of objects
-    const referrals = data.map(row => ({
-      referrerName: row[1],
-      membershipNumber: row[2],
-      referredName: row[3],
-      referredMembershipNo: row[4],
-      admissionYear: row[5],
-      referredEmail: row[6],
-      rewardGiven: normalizeRewardStatus(row[7]),
-      dateAdded: row[8],
-      rewardAmount: row[9],
-      rewardDate: row[10],
-      admissionFeePaid: normalizeYesNo(row[11]),
-      admissionFeeDate: row[12]
-    }));
+    const referrals = data.map(row => sheetRowToReferral(row, sheetHeaders()));
 
     return ContentService.createTextOutput(JSON.stringify({
       status: 'success',
