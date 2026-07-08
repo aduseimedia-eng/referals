@@ -957,10 +957,11 @@
         .table-tools {
             display: flex;
             gap: 10px;
-            width: min(520px, 100%);
+            width: min(680px, 100%);
         }
 
-        .table-tools #yearFilter {
+        .table-tools #yearFilter,
+        .table-tools #paymentStatusFilter {
             max-width: 160px;
         }
 
@@ -1354,7 +1355,8 @@
                 width: 100%;
             }
 
-            .table-tools #yearFilter {
+            .table-tools #yearFilter,
+            .table-tools #paymentStatusFilter {
                 max-width: none;
             }
 
@@ -1674,9 +1676,14 @@
                     <h2>Referral Records</h2>
                     <div class="table-tools">
                         <select id="yearFilter" class="search-box" onchange="filterTable(true)">
-                            <option value="">🗓️ All Years</option>
+                            <option value="">All Years</option>
                         </select>
-                        <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search referrals...">
+                        <select id="paymentStatusFilter" class="search-box" onchange="filterTable(true)">
+                            <option value="">All Payment Status</option>
+                            <option value="Yes">Paid</option>
+                            <option value="No">Not paid</option>
+                        </select>
+                        <input type="text" class="search-box" id="searchBox" placeholder="Search referrals...">
                     </div>
                 </div>
                 <div class="table-container">
@@ -2210,7 +2217,7 @@
             const years = Array.from(allYears).sort((a, b) => b - a);
             
             const currentValue = yearFilter.value;
-            const optionsHtml = '<option value="">🗓️ All Years</option>' + 
+            const optionsHtml = '<option value="">All Years</option>' +
                 years.map(year => `<option value="${year}">${year}</option>`).join('');
             yearFilter.innerHTML = optionsHtml;
             yearFilter.value = currentValue;
@@ -2219,6 +2226,7 @@
         function filterTable(resetPage = false) {
             const searchValue = document.getElementById('searchBox').value;
             const yearValue = document.getElementById('yearFilter').value;
+            const paymentStatusValue = document.getElementById('paymentStatusFilter').value;
             
             const tbody = document.getElementById('referralTableBody');
             const paginationSummary = document.getElementById('paginationSummary');
@@ -2235,8 +2243,9 @@
                     String(r.rewardDate || '').includes(searchValue);
                 
                 const matchesYear = !yearValue || String(r.admissionYear) === yearValue;
+                const matchesPaymentStatus = !paymentStatusValue || normalizeYesNo(r.admissionFeePaid) === paymentStatusValue;
                 
-                return matchesSearch && matchesYear;
+                return matchesSearch && matchesYear && matchesPaymentStatus;
             });
 
             if (resetPage) {
