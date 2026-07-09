@@ -68,7 +68,7 @@ function setupReferralSheetColumns() {
 }
 
 function reportHeaders() {
-  return ['No.', 'Referrer Name/Recommending Agent', 'Membership Number', 'Referred Member Name', 'Admission Year', 'Referred Email', 'Admission Fee Paid', 'Admission Fee Date', 'Reward Status', 'Reward Date', 'Date'];
+  return ['No.', 'Recommending Agent', 'Membership Number', 'Referred Member Name', 'Admission Year', 'Referred Email', 'Admission Fee Paid', 'Admission Fee Date', 'Reward Status', 'Reward Date', 'Date'];
 }
 
 function csvCell(value) {
@@ -118,7 +118,7 @@ function sheetRowToReferral(row, headers) {
   const fallbackEmail = row[6] && String(row[6]).includes('@') ? row[6] : row[5];
 
   return {
-    referrerName: getRowValue(row, headers, ['Referrer Name/Recommending Agent'], 1),
+    referrerName: getRowValue(row, headers, ['Recommending Agent', 'Referrer Name/Recommending Agent'], 1),
     membershipNumber: getRowValue(row, headers, ['Membership Number'], 2),
     referredName: getRowValue(row, headers, ['Referred Member Name'], 3),
     referredMembershipNo: getRowValue(row, headers, ['Referred Membership No.'], -1),

@@ -1691,7 +1691,7 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Referrer Name/Recommending Agent</th>
+                                <th>Recommending Agent</th>
                                 <th>Referred Member Name</th>
                                 <th>Admission Fee Paid</th>
                                 <th>Reward Status</th>
@@ -2485,7 +2485,7 @@
         });
 
         function buildReferralReportRows() {
-            const headers = ['No.', 'Referrer Name/Recommending Agent', 'Membership Number', 'Referred Member Name', 'Admission Year', 'Referred Email', 'Admission Fee Paid', 'Admission Fee Date', 'Reward Status', 'Reward Date', 'Date'];
+            const headers = ['No.', 'Recommending Agent', 'Membership Number', 'Referred Member Name', 'Admission Year', 'Referred Email', 'Admission Fee Paid', 'Admission Fee Date', 'Reward Status', 'Reward Date', 'Date'];
             const rows = referrals.map((r, i) => [
                 i + 1,
                 r.referrerName,
